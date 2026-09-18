@@ -1,0 +1,376 @@
+import os
+
+html_content = """<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De mim para você 📼 1980s Special Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-pink: #ff2a8d;
+      --neon-purple: #9d4edf;
+      --neon-cyan: #00f0ff;
+      --neon-yellow: #ffe600;
+      --bg-dark: #0d0221;
+      --card-bg: rgba(25, 10, 45, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(255, 42, 141, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 42, 141, 0.15) 1px, transparent 1px);
+      background-size: 40px 40px;
+      padding-bottom: 50px;
+    }
+
+    /* Efeito TV CRT */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+
+    .badge-80s {
+      display: inline-block;
+      font-family: 'VT323', monospace;
+      font-size: 1.4rem;
+      color: var(--neon-cyan);
+      border: 2px solid var(--neon-cyan);
+      padding: 4px 15px;
+      border-radius: 20px;
+      letter-spacing: 2px;
+      box-shadow: 0 0 10px var(--neon-cyan);
+      margin-bottom: 15px;
+      animation: pulse 2s infinite alternate;
+    }
+
+    h1 {
+      font-family: 'VT323', monospace;
+      font-size: 3rem;
+      color: #fff;
+      text-shadow: 
+        0 0 5px #fff,
+        0 0 10px var(--neon-pink),
+        0 0 20px var(--neon-pink),
+        0 0 40px var(--neon-pink);
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: #e0c3fc;
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto;
+      font-weight: 300;
+    }
+
+    /* Player de áudio estilo fita cassete */
+    .cassette-player {
+      max-width: 450px;
+      margin: 30px auto;
+      background: linear-gradient(145deg, #1f1a3a, #0b0518);
+      border: 3px solid var(--neon-pink);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(255, 42, 141, 0.4);
+      text-align: center;
+    }
+
+    .cassette-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      color: var(--neon-yellow);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .cassette-wheels {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #05020a;
+      border-radius: 10px;
+      padding: 15px;
+      border: 1px solid var(--neon-purple);
+    }
+
+    .wheel {
+      width: 50px;
+      height: 50px;
+      border: 6px dashed var(--neon-cyan);
+      border-radius: 50%;
+      animation: spin 4s linear infinite paused;
+    }
+
+    .playing .wheel {
+      animation-play-state: running;
+    }
+
+    .tape-window {
+      width: 120px;
+      height: 35px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .music-btn {
+      margin-top: 15px;
+      background: var(--neon-pink);
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--neon-pink);
+      transition: all 0.3s ease;
+    }
+
+    .music-btn:hover {
+      transform: scale(1.05);
+      background: #ff0077;
+    }
+
+    /* Galeria Retro Polaroid */
+    .gallery-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .polaroid-card {
+      background: #fdfbf7;
+      padding: 15px 15px 25px 15px;
+      border-radius: 4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+      transform: rotate(-2deg);
+      transition: all 0.4s ease;
+      color: #222;
+    }
+
+    .polaroid-card:nth-child(even) {
+      transform: rotate(2deg);
+    }
+
+    .polaroid-card:hover {
+      transform: scale(1.05) rotate(0deg);
+      z-index: 10;
+      box-shadow: 0 0 25px var(--neon-cyan);
+    }
+
+    .polaroid-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+    }
+
+    .polaroid-caption {
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      text-align: center;
+      margin-top: 12px;
+      color: #111;
+    }
+
+    /* Seção de Bilhete do Coração */
+    .love-letter {
+      max-width: 650px;
+      margin: 50px auto;
+      background: var(--card-bg);
+      border: 2px solid var(--neon-purple);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 30px rgba(157, 78, 223, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    .love-letter h2 {
+      font-family: 'VT323', monospace;
+      font-size: 2.2rem;
+      color: var(--neon-cyan);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .love-letter p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #f1e4ff;
+      margin-bottom: 15px;
+    }
+
+    .interactive-box {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .surprise-btn {
+      background: transparent;
+      border: 2px solid var(--neon-yellow);
+      color: var(--neon-yellow);
+      padding: 12px 24px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.75rem;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--neon-yellow);
+      transition: 0.3s;
+    }
+
+    .surprise-btn:hover {
+      background: var(--neon-yellow);
+      color: #000;
+    }
+
+    .hidden-message {
+      display: none;
+      margin-top: 20px;
+      font-family: 'VT323', monospace;
+      font-size: 1.8rem;
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+      animation: fadeIn 1s forwards;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 5px var(--neon-cyan); }
+      100% { box-shadow: 0 0 20px var(--neon-cyan); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge-80s">EDITION 1986 ★ RETRO LOVE</div>
+    <h1>Nossa Viagem aos Anos 80</h1>
+    <p class="subtitle">Uma surpresa especial para lembrar que o meu amor por você atravessa qualquer época. ❤️</p>
+  </header>
+
+  <!-- Player Cassete -->
+  <div class="cassette-player" id="cassettePlayer">
+    <div class="cassette-title">🎵 Mixtape Especial Anos 80</div>
+    <div class="cassette-wheels">
+      <div class="wheel"></div>
+      <div class="tape-window"></div>
+      <div class="wheel"></div>
+    </div>
+    <button class="music-btn" id="playBtn">▶ APERTAR PLAY</button>
+    <!-- Música livre Synthwave retro -->
+    <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=synthwave-80s-110045.mp3"></audio>
+  </div>
+
+  <!-- Galeria de Fotos -->
+  <div class="gallery-container">
+    
+    <div class="polaroid-card">
+      <img src="IMG_20260918_095650_350.jpg" class="polaroid-img" alt="Foto 80s 1">
+      <div class="polaroid-caption">A Garota Mais Linda dos 80s ✨</div>
+    </div>
+
+    <div class="polaroid-card">
+      <img src="IMG_20260918_095640_218.jpg" class="polaroid-img" alt="Foto 80s 2">
+      <div class="polaroid-caption">Sempre no Meu Ritmo 🎶</div>
+    </div>
+
+    <div class="polaroid-card">
+      <img src="IMG_20260918_095637_843.jpg" class="polaroid-img" alt="Foto 80s 3">
+      <div class="polaroid-caption">Nossa Viagem de Moto 🏍️</div>
+    </div>
+
+    <div class="polaroid-card">
+      <img src="IMG_20260918_095634_652.jpg" class="polaroid-img" alt="Foto 80s 4">
+      <div class="polaroid-caption">Nós + Nosso Gatinho 🐱</div>
+    </div>
+
+  </div>
+
+  <!-- Carta / Bilhete -->
+  <div class="love-letter">
+    <h2>📟 Mensagem Para Você</h2>
+    <p>Se a gente estivesse nos anos 80, eu com certeza estaria gravando fitas cassete com as melhores músicas de amor só pra te dar de presente no recreio ou te ligando de um orelhão.</p>
+    <p>O tempo passa, mas a certeza que eu tenho é que você deixa meu dia mais colorido, leve e especial. Obrigado por ser minha parceira de vida e de aventuras!</p>
+    
+    <div class="interactive-box">
+      <button class="surprise-btn" id="surpriseBtn">CLIQUE AQUI PARA UMA SURPRESA</button>
+      <div class="hidden-message" id="hiddenMsg">
+        🚀 Te amo do presente até o futuro! ❤️
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    const cassettePlayer = document.getElementById('cassettePlayer');
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    const hiddenMsg = document.getElementById('hiddenMsg');
+
+    playBtn.addEventListener('click', () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        cassettePlayer.classList.add('playing');
+        playBtn.innerText = '❚❚ PAUSAR MIXTAPE';
+        playBtn.style.background = '#00f0ff';
+        playBtn.style.color = '#000';
+      } else {
+        bgMusic.pause();
+        cassettePlayer.classList.remove('playing');
+        playBtn.innerText = '▶ APERTAR PLAY';
+        playBtn.style.background = '#ff2a8d';
+        playBtn.style.color = '#fff';
+      }
+    });
+
+    surpriseBtn.addEventListener('click', () => {
+      hiddenMsg.style.display = 'block';
+      surpriseBtn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("Arquivo index.html criado com sucesso!")
